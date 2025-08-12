@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sesión 1 — Mini CYOA con Twine (Harlowe) — Guía de Clase</title>
+<style>
+  :root{
+    --ink:#111; --muted:#555; --bg:#fff; --accent:#0b74de;
+  }
+  @page { size: A4; margin: 16mm; }
+  html,body{ background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+  .wrap{ max-width: 860px; margin: 0 auto; }
+  h1{ font-size: 1.9rem; margin: 0 0 .25rem; }
+  h2{ font-size: 1.25rem; margin: 1.25rem 0 .4rem; border-bottom: 2px solid #eee; padding-bottom: .2rem; }
+  h3{ font-size: 1.05rem; margin: 1rem 0 .3rem; }
+  p{ margin: .4rem 0; }
+  ul, ol{ margin: .3rem 0 .6rem 1.25rem; }
+  .lead{ color: var(--muted); margin-bottom: 1rem; }
+  .grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card{ border:1px solid #e5e5e5; border-radius: 10px; padding: 12px 14px; background:#fafafa; }
+  code, pre{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 14px; }
+  pre{ background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:10px; overflow:auto; }
+  .small{ font-size: .9rem; color: var(--muted); }
+  .checklist li{ margin-bottom: .25rem; }
+  .pill{ display:inline-block; border-radius:999px; padding:.08rem .5rem; background:#eef6ff; color:#0b74de; font-weight:600; margin-right:.25rem; }
+  .kbd{ display:inline-block; border:1px solid #ccc; border-bottom-width:2px; padding:.05rem .35rem; border-radius:6px; background: #f8f8f8; font-family: ui-monospace, monospace; font-size:.95em;}
+  .mono{ font-family: ui-monospace, monospace; }
+  .two-col pre{ margin-top: 0; }
+  .hr{ height:1px; background:#eee; margin: 10px 0 12px; }
+  .footer{ margin-top: 16px; font-size:.9rem; color:#777; }
+  @media print{
+    .no-print{ display:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sesión 1 — Mini CYOA con Twine (Harlowe)</h1>
+  <p class="lead">Guía de clase de bolsillo para Vasco — crear, probar y publicar una micro‑aventura con pasajes, enlaces y una variable.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Objetivos</h2>
+      <ul>
+        <li>Entender el modelo <strong>pasajes + enlaces</strong>.</li>
+        <li>Usar <strong>1 variable</strong> (p.ej. <span class="mono">$llave</span>) y una condición <span class="mono">(if:)</span>.</li>
+        <li>Construir ≥ <strong>5 pasajes</strong> y ≥ <strong>2 finales</strong>.</li>
+        <li>Exportar el juego como <strong>.html</strong> y abrirlo offline.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Conceptos clave</h2>
+      <ul>
+        <li><strong>Pasaje</strong>: bloque de texto (nodo) de la historia.</li>
+        <li><strong>Enlace</strong>: <span class="mono">[[Texto -&gt; Destino]]</span>.</li>
+        <li><strong>Estado</strong> (variables): guardan decisiones del jugador.</li>
+        <li><strong>StoryInit</strong>: pasaje especial que corre al inicio; ideal para inicializar variables.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Procedimiento en 10 pasos</h2>
+  <ol>
+    <li>Abrir <strong>Twine</strong> &rarr; <em>New &rarr; New Story</em>.</li>
+    <li>Crear pasaje <strong>Inicio</strong> con dos enlaces (dos rutas).</li>
+    <li>Crear <strong>StoryInit</strong> e inicializar variables.</li>
+    <li>Escribir los pasajes de cada ruta (2–3 por ruta).</li>
+    <li>Usar <span class="mono">(set:)</span> para cambiar variables.</li>
+    <li>Usar <span class="mono">(if:)</span> y <span class="mono">(else:)</span> para puertas lógicas.</li>
+    <li>Crear dos pasajes de <strong>Final</strong> (ganar / perder).</li>
+    <li>Probar con <em>Play</em> y revisar que todas las rutas funcionen.</li>
+    <li><em>Build &rarr; Publish to File</em> &rarr; guardar <span class="mono">tu_historia.html</span>.</li>
+    <li>Abrir el HTML en el navegador (funciona sin internet).</li>
+  </ol>
+
+  <h2>Plantilla mínima (copiar/pegar)</h2>
+  <div class="two-col grid">
+    <div>
+      <h3>StoryInit</h3>
+      <pre>(set: $llave to false)</pre>
+      <h3>Inicio</h3>
+      <pre>Eres un explorador frente a dos rutas.
+[[Ir a la cueva-&gt;Cueva]]
+[[Seguir el río-&gt;Rio]]</pre>
+      <h3>Rio</h3>
+      <pre>Encuentras una llave brillante entre las rocas.
+(if: $llave is false)[
+  (set: $llave to true)
+  Tomas la llave y la guardas.
+]
+[[Regresar a la cueva-&gt;Cueva]]</pre>
+    </div>
+    <div>
+      <h3>Cueva</h3>
+      <pre>La cueva es fría. Hay una puerta sellada.
+(if: $llave is true)[
+  Ves una cerradura que coincide. [[Abrir la puerta-&gt;Tesoro]]
+]
+(else:)[
+  No tienes cómo abrirla… [[Explorar más-&gt;Profundidades]]
+]</pre>
+      <h3>Tesoro</h3>
+      <pre>¡La puerta se abre! Hallas un cofre antiguo.
+<strong>Final: Tesoro</strong></pre>
+      <h3>Profundidades</h3>
+      <pre>Un derrumbe bloquea tu salida.
+<strong>Final: Desastre</strong></pre>
+    </div>
+  </div>
+
+  <h2>Variaciones de historia (elige 1)</h2>
+  <ul>
+    <li><span class="pill">Linterna</span> Bosque nocturno; variable <span class="mono">$linterna</span> habilita atajo.</li>
+    <li><span class="pill">Mapa secreto</span> Ciudad/museo; <span class="mono">$mapa</span> desbloquea sala oculta.</li>
+    <li><span class="pill">Compañero</span> Túnel; <span class="mono">$compa</span> permite mover piedra.</li>
+    <li><span class="pill">2 de 3 pistas</span> Bóveda; contador <span class="mono">$pistas</span> (0–3).</li>
+    <li><span class="pill">Promesa</span> Moral simple; <span class="mono">$promesa</span> cambia el final.</li>
+    <li><span class="pill">Tarjeta</span> Sci‑fi; <span class="mono">$tarjeta</span> activa consola.</li>
+    <li><span class="pill">Pase</span> Urbano; <span class="mono">$pase</span> para entrar a concierto.</li>
+    <li><span class="pill">Día/Noche</span> Interruptor <span class="mono">$dia</span> decide Jardín/Catacumbas.</li>
+  </ul>
+
+  <h2>Checklist de calidad (rúbrica)</h2>
+  <ul class="checklist">
+    <li>✅ ≥ 5 pasajes bien nombrados.</li>
+    <li>✅ ≥ 2 finales claramente etiquetados.</li>
+    <li>✅ 1 variable funciona (se inicializa y cambia).</li>
+    <li>✅ No hay pasajes huérfanos (sin entrada/salida).</li>
+    <li>✅ Exportado a <span class="mono">.html</span> y abre offline.</li>
+  </ul>
+
+  <h2>Errores comunes y soluciones</h2>
+  <ul>
+    <li><strong>(if:) value is the number 0, but should be a boolean</strong> → inicializa en <em>StoryInit</em>, p.ej. <span class="mono">(set: $llave to false)</span>.</li>
+    <li><strong>There’s nothing before this to do (else:) with.</strong> → coloca <span class="mono">(else:)</span> justo después del bloque <span class="mono">(if:)[…]</span> sin texto entre medio.</li>
+    <li><strong>Estados viejos</strong> → reinicia: en la vista de juego, botón <em>Restart</em>.</li>
+    <li><strong>Duplicar “recompensas”</strong> → protege con bandera local, p.ej. <span class="mono">$rio_done</span>, antes de sumar o entregar ítems.</li>
+  </ul>
+
+  <h2>Estilo y accesibilidad (opcional)</h2>
+  <pre>Story &rarr; Edit Story Stylesheet
+tw-story { font-family: system-ui, sans-serif; }
+tw-passage { max-width: 40rem; margin: 2rem auto; line-height: 1.5; }
+</pre>
+
+  <h2>Mini‑retos (si terminas antes)</h2>
+  <ol>
+    <li>Agregar un <strong>final secreto</strong> desde Inicio.</li>
+    <li>Mostrar un inventario textual cuando tengas la llave.</li>
+    <li>Cambiar el texto del botón según el estado, p.ej. “Abrir”/“Bloqueado”.</li>
+  </ol>
+
+  
+  <h2>Publicación en GitHub Pages (GH Pages)</h2>
+  <p><em>Objetivo:</em> subir tu juego Twine a un repositorio y publicarlo gratis con GitHub Pages.</p>
+  <div class="card">
+    <h3>Opción A — Publicar desde una rama (simple y recomendado para Twine)</h3>
+    <ol>
+      <li>En GitHub crea un repositorio nuevo o usa uno existente. Si quieres un sitio de usuario, nómbralo <span class="mono">&lt;usuario&gt;.github.io</span>.</li>
+      <li>Sube tu archivo exportado de Twine y renómbralo <span class="mono">index.html</span> para que sea la página de inicio.</li>
+      <li>En el repositorio ve a <strong>Settings → Pages</strong>.</li>
+      <li>En <strong>Build and deployment → Source</strong> selecciona <strong>Deploy from a branch</strong>.</li>
+      <li>Elige la rama (p. ej. <span class="mono">main</span>) y la carpeta <strong>/(root)</strong> o <strong>/docs</strong> donde está tu <span class="mono">index.html</span>. Luego pulsa <strong>Save</strong>.</li>
+      <li>GitHub ejecutará un flujo de <em>Actions</em> y publicará el sitio. Puede tardar algunos minutos.</li>
+      <li>Vuelve a <strong>Settings → Pages</strong> y pulsa <strong>Visit site</strong> para abrir tu juego.</li>
+    </ol>
+    <p class="small">URL final: si es un <em>project site</em>, se verá como <span class="mono">https://&lt;usuario&gt;.github.io/&lt;repo&gt;/</span>. Si usas el repositorio especial <span class="mono">&lt;usuario&gt;.github.io</span>, la URL será <span class="mono">https://&lt;usuario&gt;.github.io/</span>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Opción B — Publicar con GitHub Actions (cuando compilas tu sitio)</h3>
+    <ol>
+      <li>En <strong>Settings → Pages</strong> cambia <strong>Source</strong> a <strong>GitHub Actions</strong>.</li>
+      <li>Crea (o acepta) el flujo sugerido: debe <span class="mono">checkout</span> el repo, (opcional) construir archivos, <span class="mono">upload-pages-artifact</span> y <span class="mono">deploy-pages</span>.</li>
+    </ol>
+    <p class="small">Para Twine no necesitas compilar: la Opción A suele ser suficiente. Si usas generadores estáticos, añade un archivo vacío <span class="mono">.nojekyll</span> si publicas desde rama.</p>
+  </div>
+
+  <h3>Tips y solución de problemas</h3>
+  <ul>
+    <li>El sitio puede tardar hasta <strong>10 minutos</strong> en actualizar tras un push.</li>
+    <li>Para cuentas Free, el repo debe ser <strong>público</strong> si el propietario usa GitHub Free (usuario u organización).</li>
+    <li>Si la opción es <strong>/docs</strong>, asegúrate de que <span class="mono">index.html</span> esté dentro de esa carpeta.</li>
+    <li>Si no se publica automáticamente: confirma que alguien con permisos de admin y correo verificado haya hecho el push a la rama fuente.</li>
+  </ul>
+
+  <div class="hr"></div>
+  <p class="footer">Sesión 1 — Twine CYOA · Este material acompaña la práctica en clase. Exporta tu historia como HTML y compártela.</p>
+  <p class="small no-print">Sugerencia: imprime a PDF desde el navegador (A4, márgenes por defecto).</p>
+</div>
+</body>
+</html>
